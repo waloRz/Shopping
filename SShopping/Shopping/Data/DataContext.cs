@@ -11,8 +11,11 @@ namespace Shopping.Data
         {
         }
         
-        public DbSet<Category> Categories{ get; set; } //el DbSet mapea las entidades
+        public DbSet<Category> Categories { get; set; } //el DbSet mapea las entidades
+        public DbSet<City> Cities { get; set; } //el DbSet mapea las entidades
         public DbSet<Country> Countries { get; set; } //el DbSet mapea las entidades
+        public DbSet<State> States { get; set; } //el DbSet mapea las entidades
+
 
         // sirve para modificar la base de datos
         //crear los indices
@@ -21,6 +24,8 @@ namespace Shopping.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Category>().HasIndex(c => c.Name).IsUnique();
             modelBuilder.Entity<Country>().HasIndex(c => c.Name).IsUnique();
+            modelBuilder.Entity<State>().HasIndex("Name", "CountryId").IsUnique(); //No permite repertir los nombres de provincia en el pais
+            modelBuilder.Entity<City>().HasIndex("Name", "StateId").IsUnique(); //No permite repertir los nombres de la ciudad por provincia
         }
     }
 }
