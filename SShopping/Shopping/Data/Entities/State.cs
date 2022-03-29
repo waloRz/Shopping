@@ -12,9 +12,9 @@ namespace Shopping.Data.Entities
         [Required(ErrorMessage = "El Campo {0} es Obligatorio")] //Required hace que el campo sea obligatorio
         public string Name { get; set; }
 
-        public Country Country { get; set; }
+        public Country Country { get; set; } // 1 provincia solo tiene 1 PAIS
 
-        public ICollection<City> Cities { get; set; }
+        public ICollection<City> Cities { get; set; } // 1 provincia tiene * ciudades
 
         [Display(Name = "Ciudades")]
         public int CitiesNumber => Cities == null ? 0 : Cities.Count;

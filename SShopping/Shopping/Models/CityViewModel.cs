@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Shopping.Data.Entities
-{
-    public class City
+namespace Shopping.Models
+{ 
+    public class CityViewModel
     {
         public int Id { get; set; }
 
@@ -12,7 +12,7 @@ namespace Shopping.Data.Entities
         [Required(ErrorMessage = "El Campo {0} es Obligatorio")] //Required hace que el campo sea obligatorio
         public string Name { get; set; }
 
-        public State State { get; set; }   // 1 ciudad tiene 1 Provincia
+        public int StateId { get; set; } // me devulve el id de la Provincia a la cual pertenece la ciudad
 
     }
 }
