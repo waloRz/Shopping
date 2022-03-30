@@ -3,7 +3,7 @@ using Shopping.Data.Entities;
 
 namespace Shopping.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         //DbContextOptions(Clase Generica)
         //al colocar :base(options) le paso el option a la clase padre en este caso al DbContext

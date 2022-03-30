@@ -14,5 +14,7 @@ namespace Shopping.Data.Entities
 
         public State State { get; set; }   // 1 ciudad tiene 1 Provincia
 
+        public ICollection<User> Users { get; set; }    
+
     }
 }
