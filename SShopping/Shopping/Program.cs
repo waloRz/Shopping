@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Data;
+using Shopping.Data.Entities;
+using Shopping.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +15,26 @@ builder.Services.AddDbContext<DataContext>(op =>
     op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
+//TODO: Pendiente de condiciones de Password (program)
+builder.Services.AddIdentity<User, IdentityRole>(cfg =>
+{
+    cfg.User.RequireUniqueEmail = true;
+    cfg.Password.RequireDigit = false;
+    cfg.Password.RequiredUniqueChars = 0;
+    cfg.Password.RequireLowercase = false;
+    cfg.Password.RequireNonAlphanumeric = false;
+    cfg.Password.RequireUppercase = false;
+    cfg.Password.RequiredLength = 6;
+}).AddEntityFrameworkStores<DataContext>();
+
+
 //Inyecciones segun el ciclo de vida del objeto
 builder.Services.AddTransient<SeedDb>(); //lo uso una sola vez cuando lo necesita y lo destruye, - veces se lo usa
 //builder.Services.AddScoped<SeedDb>();   // cada vez que lo necesita lo inyecta y lo destruye al dejar de usar, + usados
 //builder.Services.AddSingleton<SeedDb>(); //lo inyecta una vez y no lo destruye lo deja en memoria
+
+builder.Services.AddScoped<IUserHelper, UserHelper>();
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
@@ -47,6 +66,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
