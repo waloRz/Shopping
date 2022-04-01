@@ -32,28 +32,27 @@ namespace Shopping.Data
         string phone,
         string address,
         UserType userType)
+        {
+            User user = await _userHelper.GetUserAsync(email);
+            if (user == null)
             {
-                User user = await _userHelper.GetUserAsync(email);
-                if (user == null)
+                user = new User
                 {
-                    user = new User
-                    {
-                        FirstName = firstName,
-                        LastName = lastName,
-                        Email = email,
-                        UserName = email,
-                        PhoneNumber = phone,
-                        Address = address,
-                        Document = document,
-                        City = _context.Cities.FirstOrDefault(),
-                        UserType = userType,
-                    };
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    UserName = email,
+                    PhoneNumber = phone,
+                    Address = address,
+                    Document = document,
+                    City = _context.Cities.FirstOrDefault(),
+                    UserType = userType,
+                };
 
-                    await _userHelper.AddUserAsync(user, "123456");
-                    await _userHelper.AddUserToRoleAsync(user, userType.ToString());
-                }
-
-                return user;
+                await _userHelper.AddUserAsync(user, "123456");
+                await _userHelper.AddUserToRoleAsync(user, userType.ToString());
+            }
+            return user;
         }
 
 
@@ -61,7 +60,6 @@ namespace Shopping.Data
         {
             await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
             await _userHelper.CheckRoleAsync(UserType.User.ToString());
-
         }
 
         private async Task CheckCountriesAsync()
@@ -127,7 +125,6 @@ namespace Shopping.Data
                     }
                 });
             }
-
             await _context.SaveChangesAsync();
         }
 
