@@ -41,6 +41,7 @@ builder.Services.AddTransient<SeedDb>(); //lo uso una sola vez cuando lo necesit
 //builder.Services.AddSingleton<SeedDb>(); //lo inyecta una vez y no lo destruye lo deja en memoria
 
 builder.Services.AddScoped<IUserHelper, UserHelper>();
+builder.Services.AddScoped<ICombosHelper, CombosHelper>();
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
