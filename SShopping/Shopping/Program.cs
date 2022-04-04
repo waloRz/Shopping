@@ -36,13 +36,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 
 //Inyecciones segun el ciclo de vida del objeto
-builder.Services.AddTransient<SeedDb>(); //lo uso una sola vez cuando lo necesita y lo destruye, - veces se lo usa
+
 //builder.Services.AddScoped<SeedDb>();   // cada vez que lo necesita lo inyecta y lo destruye al dejar de usar, + usados
 //builder.Services.AddSingleton<SeedDb>(); //lo inyecta una vez y no lo destruye lo deja en memoria
 
+builder.Services.AddTransient<SeedDb>(); //lo uso una sola vez cuando lo necesita y lo destruye, - veces se lo usa
 builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<ICombosHelper, CombosHelper>();
-
+builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 var app = builder.Build();

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Shopping.Data.Entities
 {
@@ -12,6 +13,7 @@ namespace Shopping.Data.Entities
         [Required(ErrorMessage = "El Campo {0} es Obligatorio")] //Required hace que el campo sea obligatorio
         public string Name { get; set; }
 
+        [JsonIgnore]
         public State State { get; set; }   // 1 ciudad tiene 1 Provincia
 
         public ICollection<User> Users { get; set; }    
