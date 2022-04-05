@@ -6,7 +6,9 @@ namespace Shopping.Helpers
 {
     public interface IUserHelper
     {
-        Task<User> GetUserAsync(string email);
+        Task<User> GetUserAsync(string email)
+            ;
+        Task<User> GetUserAsync(Guid userId);
 
         Task<IdentityResult> AddUserAsync(User user, string password);
 
@@ -21,6 +23,11 @@ namespace Shopping.Helpers
         Task<SignInResult> LoginAsync(LoginViewModel model); //me devuelve si pudo o no pudo loguearse
 
         Task LogoutAsync();
+        Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
+
+        Task<IdentityResult> UpdateUserAsync(User user);
+
+     
 
     }
 }
