@@ -20,6 +20,8 @@ namespace Shopping.Data
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<TemporalSale> TemporalSales{ get; set; }
+        public DbSet<Sale> Sales { get; set; }
+        public DbSet<SaleDetail> SaleDetails { get; set; }
 
         // sirve para modificar la base de datos
         //crear los indices
