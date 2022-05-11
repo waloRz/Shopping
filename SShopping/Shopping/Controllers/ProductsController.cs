@@ -5,6 +5,7 @@ using Shopping.Data;
 using Shopping.Data.Entities;
 using Shopping.Helpers;
 using Shopping.Models;
+using Vereyon.Web;
 
 namespace Shopping.Controllers
 {
@@ -14,17 +15,19 @@ namespace Shopping.Controllers
         private readonly DataContext _context;
         private readonly ICombosHelper _combosHelper;
         private readonly IBlobHelper _blobHelper;
+        private readonly IFlashMessage _flashMessage;
 
-        public ProductsController(DataContext context, ICombosHelper combosHelper, IBlobHelper blobHelper)
+        public ProductsController(DataContext context, ICombosHelper combosHelper, IBlobHelper blobHelper, IFlashMessage flashMessage)
         {
             _context = context;
             _combosHelper = combosHelper;
             _blobHelper = blobHelper;
+            _flashMessage = flashMessage;
         }
         public async Task<IActionResult> Index()
         {
             return View(await _context.Products
-                .Include(p => p.ProductImages )
+                .Include(p => p.ProductImages)
                 .Include(p => p.ProductCategories)
                 .ThenInclude(pc => pc.Category)
                 .ToListAsync());
@@ -85,16 +88,16 @@ namespace Shopping.Controllers
                 {
                     if (dbUpdateException.InnerException.Message.Contains("duplicate"))
                     {
-                        ModelState.AddModelError(string.Empty, "Ya existe un producto con el mismo nombre.");
+                        _flashMessage.Danger("Ya existe un producto con el mismo nombre.");
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                        _flashMessage.Danger(dbUpdateException.InnerException.Message);
                     }
                 }
                 catch (Exception exception)
                 {
-                    ModelState.AddModelError(string.Empty, exception.Message);
+                    _flashMessage.Danger(exception.Message);
                 }
             }
 
@@ -151,16 +154,16 @@ namespace Shopping.Controllers
             {
                 if (dbUpdateException.InnerException.Message.Contains("duplicate"))
                 {
-                    ModelState.AddModelError(string.Empty, "Ya existe un producto con el mismo nombre.");
+                    _flashMessage.Danger("Ya existe un producto con el mismo nombre.");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                    _flashMessage.Danger(dbUpdateException.InnerException.Message);
                 }
             }
             catch (Exception exception)
             {
-                ModelState.AddModelError(string.Empty, exception.Message);
+                _flashMessage.Danger(exception.Message);
             }
 
             return View(model);
@@ -227,7 +230,7 @@ namespace Shopping.Controllers
                 }
                 catch (Exception exception)
                 {
-                    ModelState.AddModelError(string.Empty, exception.Message);
+                    _flashMessage.Danger(exception.Message);
                 }
             }
 
@@ -270,7 +273,7 @@ namespace Shopping.Controllers
             {
                 return NotFound();
             }
-           
+
             List<Category> categories = product.ProductCategories.Select(pc => new Category
             {
                 Id = pc.Category.Id,
@@ -282,7 +285,7 @@ namespace Shopping.Controllers
                 ProductId = product.Id,
                 Categories = await _combosHelper.GetComboCategoriesAsync(categories),
             };
-          
+
             return View(model);
         }
 
@@ -297,7 +300,7 @@ namespace Shopping.Controllers
 
             if (ModelState.IsValid)
             {
-                
+
                 ProductCategory productCategory = new()
                 {
                     Category = await _context.Categories.FindAsync(model.CategoryId),
@@ -312,7 +315,7 @@ namespace Shopping.Controllers
                 }
                 catch (Exception exception)
                 {
-                    ModelState.AddModelError(string.Empty, exception.Message);
+                    _flashMessage.Danger(exception.Message);
                 }
             }
 
@@ -372,15 +375,15 @@ namespace Shopping.Controllers
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductCategories)
                 .FirstOrDefaultAsync(p => p.Id == model.Id);
-            
+
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
-            
+
             foreach (ProductImage productImage in product.ProductImages)
             {
                 await _blobHelper.DeleteBlobAsync(productImage.ImageId, "products");
             }
-            
+
             return RedirectToAction(nameof(Index));
         }
 

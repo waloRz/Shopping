@@ -148,7 +148,7 @@ namespace Shopping.Controllers
                     return RedirectToAction(nameof(Login));
                 }
 
-                ModelState.AddModelError(string.Empty, response.Message);
+                _flashMessage.Danger(response.Message);
 
             }
             model.Countries = await _combosHelper.GetComboCountriesAsync();
@@ -281,7 +281,7 @@ namespace Shopping.Controllers
                 {
                     if (model.OldPassword == model.NewPassword)
                     {
-                        ModelState.AddModelError(string.Empty, "Debes Ingresar una Contraseña Diferente");
+                        _flashMessage.Danger("Debes Ingresar una Contraseña Diferente");
                         return View(model);
                     }
 
@@ -292,12 +292,12 @@ namespace Shopping.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Contraseña Invalida"); //result.Errors.FirstOrDefault().Description
+                        _flashMessage.Danger("Contraseña Invalida"); //result.Errors.FirstOrDefault().Description
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Usuario no Encontrado.");
+                    _flashMessage.Danger("Usuario no Encontrado.");
                 }
             }
 

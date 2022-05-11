@@ -7,6 +7,7 @@ using Shopping.Data.Entities;
 using Shopping.Helpers;
 using Shopping.Models;
 using System.Diagnostics;
+using Vereyon.Web;
 
 namespace Shopping.Controllers
 {
@@ -16,26 +17,76 @@ namespace Shopping.Controllers
         private readonly DataContext _context;
         private readonly IUserHelper _userHelper;
         private readonly IOrdersHelper _ordersHelper;
+        private readonly IFlashMessage _flashMessage;
 
         public HomeController(ILogger<HomeController> logger, DataContext context, IUserHelper userHelper, 
-            IOrdersHelper ordersHelper )
+            IOrdersHelper ordersHelper, IFlashMessage flashMessage )
         {
             _logger = logger;
             _context = context;
             _userHelper = userHelper;
             _ordersHelper = ordersHelper;
+            _flashMessage = flashMessage;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            List<Product> products = await _context.Products
-            .Include(p => p.ProductImages)
-            .Include(p => p.ProductCategories)
-            .OrderBy(p => p.Description)
-            .Where(p => p.Stock > 0)
-            .ToListAsync();
+          
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "NameDesc" : "";
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? "PriceDesc" : "Price";
 
-            HomeViewModel model = new() { Products = products };
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            IQueryable<Product> query = _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductCategories)
+                .ThenInclude(pc => pc.Category);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(p => (p.Name.ToLower().Contains(searchString.ToLower()) ||
+                                          p.ProductCategories.Any(pc => pc.Category.Name.ToLower().Contains(searchString.ToLower()))) &&
+                                          p.Stock > 0);
+            }
+            else
+            {
+                query = query.Where(p => p.Stock > 0);
+            }
+
+            switch (sortOrder)
+            {
+                case "NameDesc":
+                    query = query.OrderByDescending(p => p.Name);
+                    break;
+                case "Price":
+                    query = query.OrderBy(p => p.Price);
+                    break;
+                case "PriceDesc":
+                    query = query.OrderByDescending(p => p.Price);
+                    break;
+                default:
+                    query = query.OrderBy(p => p.Name);
+                    break;
+            }
+
+            int pageSize = 8;
+
+            HomeViewModel model = new() 
+            {
+                Products = await PaginatedList<Product>.CreateAsync(query, pageNumber ?? 1, pageSize),
+                Categories = await _context.Categories.ToListAsync(),
+            };
+
             User user = await _userHelper.GetUserAsync(User.Identity.Name);
             if (user != null)
             {
@@ -45,8 +96,8 @@ namespace Shopping.Controllers
             }
 
             return View(model);
-
         }
+
         public async Task<IActionResult> Add(int? id)
         {
             if (id == null)
@@ -219,7 +270,7 @@ namespace Shopping.Controllers
                 return RedirectToAction(nameof(OrderSuccess));
             }
 
-            ModelState.AddModelError(string.Empty, response.Message);
+            _flashMessage.Danger(response.Message);
             return View(model);
         }
 
@@ -328,7 +379,7 @@ namespace Shopping.Controllers
                 }
                 catch (Exception exception)
                 {
-                    ModelState.AddModelError(string.Empty, exception.Message);
+                    _flashMessage.Danger(exception.Message);
                     return View(model);
                 }
 
