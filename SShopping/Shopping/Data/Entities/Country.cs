@@ -16,6 +16,10 @@ namespace Shopping.Data.Entities
 
         //                       operador ternario -> si la lista de estado es vacio me devuelve 0 sino state.count
         [Display(Name = "Provincias")]
-        public int StatesNumber => States == null ? 0 : States.Count;    
+        public int StatesNumber => States == null ? 0 : States.Count;
+       
+        [Display(Name = "Ciudades")]
+        public int CitiesNumber => States == null ? 0 : States.Sum(s => s.CitiesNumber);
+
     }
 }
