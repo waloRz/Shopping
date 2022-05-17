@@ -81,7 +81,7 @@ namespace Shopping.Controllers
                 _flashMessage.Confirmation("El estado del pedido ha sido cambiado a 'despachado'.");
             }
 
-            return RedirectToAction(nameof(Details), new { Id = sale.Id });
+            return RedirectToAction(nameof(Details), new { id = sale.Id });
         }
 
         [Authorize(Roles = "Admin")]
@@ -110,7 +110,7 @@ namespace Shopping.Controllers
                 _flashMessage.Confirmation("El estado del pedido ha sido cambiado a 'enviado'.");
             }
 
-            return RedirectToAction(nameof(Details), new { Id = sale.Id });
+            return RedirectToAction(nameof(Details), new { id = sale.Id });
         }
 
         [Authorize(Roles = "Admin")]
